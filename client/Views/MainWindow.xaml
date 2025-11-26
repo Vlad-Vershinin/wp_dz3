@@ -3,54 +3,82 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:client.Views"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
         xmlns:vm="clr-namespace:client.ViewModels"
-        xmlns:conv="clr-namespace:client.Converters">
+        xmlns:conv="clr-namespace:client.Converters"
+        mc:Ignorable="d"
+        Title="Мессенджер" Height="600" Width="1000">
+
     <Window.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisReverse" Inverted="True"/>
-        <conv:BoolToStringConverter x:Key="BoolToText"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVis"/>
+        <conv:BoolToColorConverter x:Key="BoolToColorConverter"/>
+        <conv:BoolToStringConverter x:Key="BoolToStringConverter"/>
     </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="0.1*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" Background="#f0f0f0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Background="#f8f8f8" Padding="10">
+            <DockPanel>
+                <Button Content="Добавить чат"
+                        Command="{Binding AddChatCommand}"
+                        DockPanel.Dock="Top" Margin="0,0,0,10" Height="30"/>
+                <ListBox ItemsSource="{Binding Chats}" SelectedItem="{Binding SelectedChat}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Margin="0,0,6,0"
+                                         Fill="{Binding IsConnected, Converter={StaticResource BoolToColorConverter}}"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
 
-            <TextBlock Grid.Column="0" Text="Хост:" VerticalAlignment="Center" Margin="5"/>
-            <TextBox Grid.Column="1" Text="{Binding Host}" Margin="5" VerticalContentAlignment="Center"/>
-
-            <TextBlock Grid.Column="2" Text="Порт:" VerticalAlignment="Center" Margin="5"/>
-            <TextBox Grid.Column="3" Text="{Binding Port, StringFormat={}{0:0}}" Width="60" VerticalContentAlignment="Center"/>
-
-            <Button Grid.Column="4"
-                    Content="{Binding IsConnected, Converter={StaticResource BoolToText}}"
-                    Command="{Binding ToggleConnectionCommand}"
-                    Margin="5" Padding="10,4"/>
-        </Grid>
-
-        <Grid Grid.Row="1">
+        <Grid Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto"
+            <Grid Grid.Row="0" Background="#f0f0f0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Хост:" VerticalAlignment="Center" Margin="5"/>
+                <TextBox Grid.Column="1" Text="{Binding SelectedChat.Host, FallbackValue='127.0.0.1'}" Margin="5" VerticalContentAlignment="Center"/>
+
+                <TextBlock Grid.Column="2" Text="Порт:" VerticalAlignment="Center" Margin="5"/>
+                <TextBox Grid.Column="3" Text="{Binding SelectedChat.Port, StringFormat={}{0:0}, FallbackValue=8080}" Width="60" VerticalContentAlignment="Center"/>
+
+                <TextBlock Grid.Column="4" Text="Ник:" VerticalAlignment="Center" Margin="5"/>
+                <TextBox Grid.Column="5" Text="{Binding SelectedChat.UserName}" Margin="5" VerticalContentAlignment="Center"/>
+
+                <Button Grid.Column="6"
+                        Content="{Binding SelectedChat.IsConnected, Converter={StaticResource BoolToStringConverter}}"
+                        Command="{Binding ToggleConnectionCommand}"
+                        Margin="5" Padding="10,4"
+                        Visibility="{Binding SelectedChat, Converter={StaticResource NullToVis}}"/>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Padding="10">
-                <ItemsControl ItemsSource="{Binding Messages}">
+                <ItemsControl ItemsSource="{Binding CurrentMessages}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,4">
@@ -60,7 +88,6 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Сообщение от другого пользователя -->
                                 <StackPanel Grid.Column="0"
                                             HorizontalAlignment="Left"
                                             MaxWidth="300"
@@ -69,7 +96,6 @@
                                                Foreground="#666666"
                                                FontSize="12"
                                                Margin="0,0,0,2"/>
-
                                     <Border Background="#e6e6e6"
                                             CornerRadius="12"
                                             Padding="12,8">
@@ -78,7 +104,6 @@
                                                    Foreground="#202020"
                                                    FontSize="14"/>
                                     </Border>
-
                                     <TextBlock Text="{Binding Time, StringFormat='HH:mm'}"
                                                Foreground="#999999"
                                                FontSize="11"
@@ -86,7 +111,6 @@
                                                Margin="0,2,0,0"/>
                                 </StackPanel>
 
-                                <!-- Собственное сообщение -->
                                 <StackPanel Grid.Column="2"
                                             HorizontalAlignment="Right"
                                             MaxWidth="300"
@@ -99,7 +123,6 @@
                                                    Foreground="White"
                                                    FontSize="14"/>
                                     </Border>
-
                                     <TextBlock Text="{Binding Time, StringFormat='HH:mm'}"
                                                Foreground="#aaaaaa"
                                                FontSize="11"
@@ -112,9 +135,9 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <Grid Grid.Row="1"
+            <Grid Grid.Row="2"
                   MinHeight="30"
-                  Margin="5">
+                  Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -126,18 +149,15 @@
                          Margin="0,0,5,0"
                          VerticalScrollBarVisibility="Auto"
                          AcceptsReturn="True"
-                         Text="{Binding Text}"
+                         Text="{Binding InputText}"
                          VerticalContentAlignment="Center">
                 </TextBox>
 
                 <Button Grid.Column="1"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
                         Width="32"
                         Height="32"
                         Padding="0"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
                         Command="{Binding SendMessageCommand}"
                         Background="Transparent"
                         BorderBrush="Transparent">
@@ -147,6 +167,6 @@
                            Height="32"/>
                 </Button>
             </Grid>
-        </Grid>        
+        </Grid>
     </Grid>
 </Window>

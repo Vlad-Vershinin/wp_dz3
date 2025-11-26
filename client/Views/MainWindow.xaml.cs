@@ -1,4 +1,5 @@
 ﻿using client.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
 namespace client.Views
@@ -11,7 +12,8 @@ namespace client.Views
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+            var vm = App.ServiceProvider.GetRequiredService<MainWindowViewModel>();
+            DataContext = vm;
         }
     }
 }

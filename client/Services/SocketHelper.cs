@@ -1,9 +1,11 @@
-﻿using System;
+﻿using client.Models.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 namespace client.Services;
 
@@ -133,5 +135,18 @@ public static class TcpMessageHelper
             Debug.WriteLine($"[ОШИБКА] Неизвестная ошибка при получении: {ex.Message}");
             throw;
         }
+    }
+
+    public static async Task SendChatMessage(TcpClient client, ChatMessageDto message)
+    {
+        string json = JsonSerializer.Serialize(message, new JsonSerializerOptions { WriteIndented = false });
+        await SendMessage(client, json);
+    }
+
+    public static async Task<ChatMessageDto> ReceiveChatMessage(TcpClient client)
+    {
+        string json = await ReceiveMessage(client);
+        return JsonSerializer.Deserialize<ChatMessageDto>(json)
+               ?? throw new InvalidDataException("Некорректное сообщение");
     }
 }
