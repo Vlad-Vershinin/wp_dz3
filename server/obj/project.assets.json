@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\code\\cs\\wp_dz2\\server\\server.csproj",
+      "projectUniqueName": "F:\\code\\cs\\wp_dz3\\server\\server.csproj",
       "projectName": "server",
-      "projectPath": "F:\\code\\cs\\wp_dz2\\server\\server.csproj",
+      "projectPath": "F:\\code\\cs\\wp_dz3\\server\\server.csproj",
       "packagesPath": "C:\\Users\\parad\\.nuget\\packages\\",
-      "outputPath": "F:\\code\\cs\\wp_dz2\\server\\obj\\",
+      "outputPath": "F:\\code\\cs\\wp_dz3\\server\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
